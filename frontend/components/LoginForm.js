@@ -23,7 +23,7 @@ export default function LoginForm(props) {
     // ✨ implement
     // Trimmed username must be >= 3, and
     // trimmed password must be >= 8 for
-    // the button to become enabled
+    // the button to become enabled.
   }
 
   return (
