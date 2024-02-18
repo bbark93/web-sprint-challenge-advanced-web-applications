@@ -8,14 +8,15 @@ import Spinner from './Spinner'
 import axiosWithAuth from '../axios'
 
 // const articlesUrl = 'http://localhost:9000/api/articles'
-const loginUrl = 'http://localhost:9000/api/login'
+// const loginUrl = 'http://localhost:9000/api/login'
 
 export default function App() {
   // ✨ MVP can be achieved with these states
-  const [message, setMessage] = useState('')
-  const [articles, setArticles] = useState([])
-  const [currentArticleId, setCurrentArticleId] = useState()
-  const [spinnerOn, setSpinnerOn] = useState(false)
+  const [message, setMessage] = useState('');
+  const [articles, setArticles] = useState([]);
+  const [currentArticleId, setCurrentArticleId] = useState(null);
+  const [currentArticle, setCurrentArticle] = useState({});
+  const [spinnerOn, setSpinnerOn] = useState(false);
 
   // ✨ Research `useNavigate` in React Router v.6
   const navigate = useNavigate()
@@ -73,7 +74,7 @@ export default function App() {
     axiosWithAuth()
       .get('/articles')
       .then(res => {
-        console.log('res:',res);
+        // console.log('res:',res);
         setArticles(res.data.articles)
         setMessage(res.data.message);
         setSpinnerOn(false);
@@ -93,6 +94,21 @@ export default function App() {
     // The flow is very similar to the `getArticles` function.
     // You'll know what to do! Use log statements or breakpoints
     // to inspect the response from the server.
+    setMessage('');
+    setSpinnerOn(true);
+    axiosWithAuth()
+      .post('/articles', article)
+      .then(res => {
+        console.log(res);
+        setArticles(prevArticles => [...prevArticles, res.data.article]);
+        setMessage(res.data.message);
+        setSpinnerOn(false);
+      })
+      .catch(err => {
+        console.log(err);
+        setMessage(err.message);
+        setSpinnerOn(false);
+      })
   }
 
   const updateArticle = ({ article_id, article }) => {
@@ -120,7 +136,15 @@ export default function App() {
           <Route path="/" element={<LoginForm login={login} />} />
           <Route path="articles" element={
             <>
-              <ArticleForm />
+              <ArticleForm 
+                articles={articles} 
+                currentArticleId={currentArticleId}
+                setCurrentArticleId={setCurrentArticleId}
+                currentArticle={currentArticle}
+                setCurrentArticle={setCurrentArticle}
+                updateArticle={updateArticle}
+                postArticle={postArticle}
+              />
               <Articles getArticles={getArticles} articles={articles} />
             </>
           } />
