@@ -118,6 +118,20 @@ export default function App() {
 
   const deleteArticle = article_id => {
     // ✨ implement
+    setMessage('');
+    setSpinnerOn(true);
+    axiosWithAuth()
+      .delete(`/articles/${article_id}`)
+      .then(res => {
+        setMessage(res.data.message);
+        setArticles(prevArticles => prevArticles.filter(article => article.article_id !== parseInt(article_id)));
+        setSpinnerOn(false);
+      })
+      .catch(err => {
+        console.log(err);
+        setMessage(err.message);
+        setSpinnerOn(false);
+      })
   }
 
   return (
@@ -145,7 +159,12 @@ export default function App() {
                 updateArticle={updateArticle}
                 postArticle={postArticle}
               />
-              <Articles getArticles={getArticles} articles={articles} />
+              <Articles 
+                getArticles={getArticles}
+                articles={articles}
+                setCurrentArticleId={setCurrentArticleId}
+                deleteArticle={deleteArticle}
+              />
             </>
           } />
         </Routes>
