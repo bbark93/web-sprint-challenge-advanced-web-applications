@@ -15,7 +15,7 @@ export default function App() {
   const [message, setMessage] = useState('');
   const [articles, setArticles] = useState([]);
   const [currentArticleId, setCurrentArticleId] = useState(null);
-  const [currentArticle, setCurrentArticle] = useState({});
+  const [currentArticle, setCurrentArticle] = useState(null);
   const [spinnerOn, setSpinnerOn] = useState(false);
 
   // ✨ Research `useNavigate` in React Router v.6
@@ -111,9 +111,25 @@ export default function App() {
       })
   }
 
-  const updateArticle = ({ article_id, article }) => {
+  const updateArticle = ( article_id, article ) => {
     // ✨ implement
     // You got this!
+    setMessage('');
+    setSpinnerOn(true);
+    article.article_id = parseInt(article_id)
+    axiosWithAuth()
+      .put(`articles/${article_id}`, article)
+      .then(res => {
+        const updatedArticles = articles.toSpliced((parseInt(article_id)-1),1,article);
+        setArticles(updatedArticles);
+        setMessage(res.data.message);
+        setSpinnerOn(false);
+      })
+      .catch(err => {
+        console.log(err);
+        setMessage(err.message);
+        setSpinnerOn(false);
+      })
   }
 
   const deleteArticle = article_id => {
@@ -163,6 +179,7 @@ export default function App() {
                 getArticles={getArticles}
                 articles={articles}
                 setCurrentArticleId={setCurrentArticleId}
+                setCurrentArticle={setCurrentArticle}
                 deleteArticle={deleteArticle}
               />
             </>
